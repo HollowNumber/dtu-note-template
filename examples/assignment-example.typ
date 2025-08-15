@@ -1,4 +1,4 @@
-#import "../src/lib.typ": dtu-assignment, important, note-box, dtu-highlight, example
+#import "../src/lib.typ": dtu-assignment, important, note-box, dtu-highlight, example, dtu-table, code-block
 
 #show: dtu-assignment.with(
   course: "02102",
@@ -21,7 +21,9 @@ Write a function `binary_search(arr, target)` that returns the index of the targ
   Your implementation must have $O(log n)$ time complexity. Implementations with linear time complexity will receive partial credit only.
 ])
 
-```python
+#code-block(
+  caption: "Binary Search Implementation")[
+  ```python
 def binary_search(arr, target):
     """
     Perform binary search on a sorted array.
@@ -46,7 +48,8 @@ def binary_search(arr, target):
             right = mid - 1
     
     return -1
-```
+  ```
+]
 
 == Part B: Analysis (10 points)
 
@@ -84,37 +87,42 @@ Implement all three sorting algorithms:
 #example([
   Here's the merge sort implementation:
   
-  ```python
-  def merge_sort(arr):
-      if len(arr) <= 1:
-          return arr
-      
-      mid = len(arr) // 2
-      left = merge_sort(arr[:mid])
-      right = merge_sort(arr[mid:])
-      
-      return merge(left, right)
-  
-  def merge(left, right):
-      result = []
-      i = j = 0
-      
-      while i < len(left) and j < len(right):
-          if left[i] <= right[j]:
-              result.append(left[i])
-              i += 1
-          else:
-              result.append(right[j])
-              j += 1
-      
-      result.extend(left[i:])
-      result.extend(right[j:])
-      return result
-  ```
-])
+  #code-block(
+    caption: "Merge Sort Algorithm")[
+    ```python
+def merge_sort(arr):
+    if len(arr) <= 1:
+        return arr
+    
+    mid = len(arr) // 2
+    left = merge_sort(arr[:mid])
+    right = merge_sort(arr[mid:])
+    
+    return merge(left, right)
+
+def merge(left, right):
+    result = []
+    i = j = 0
+    
+    while i < len(left) and j < len(right):
+        if left[i] <= right[j]:
+            result.append(left[i])
+            i += 1
+        else:
+            result.append(right[j])
+            j += 1
+    
+    result.extend(left[i:])
+    result.extend(right[j:])
+    return result
+    ```
+  )
+]])
 
 *Bubble Sort:*
-```python
+#code-block(
+  caption: "Bubble Sort Algorithm")[
+  ```python
 def bubble_sort(arr):
     n = len(arr)
     for i in range(n):
@@ -126,10 +134,13 @@ def bubble_sort(arr):
         if not swapped:
             break
     return arr
-```
+  ```
+]
 
 *Quick Sort:*
-```python
+#code-block(
+  caption: "Quick Sort Algorithm")[
+  ```python
 def quick_sort(arr):
     if len(arr) <= 1:
         return arr
@@ -140,17 +151,21 @@ def quick_sort(arr):
     right = [x for x in arr if x > pivot]
     
     return quick_sort(left) + middle + quick_sort(right)
-```
+```]
+
 
 == Part B: Complexity Analysis (10 points)
 
 Fill in the complexity comparison table:
 
-| Algorithm   | Best Case | Average Case | Worst Case | Space Complexity |
-|-------------|-----------|--------------|------------|------------------|
-| Bubble Sort | O(n)      | O(n²)        | O(n²)      | O(1)             |
-| Merge Sort  | O(n log n)| O(n log n)   | O(n log n) | O(n)             |
-| Quick Sort  | O(n log n)| O(n log n)   | O(n²)      | O(log n)         |
+#dtu-table(
+  columns: 5,
+  caption: "Sorting Algorithm Complexity Comparison",
+  [*Algorithm*], [*Best Case*], [*Average Case*], [*Worst Case*], [*Space Complexity*],
+  [Bubble Sort], [O(n)], [O(n²)], [O(n²)], [O(1)],
+  [Merge Sort], [O(n log n)], [O(n log n)], [O(n log n)], [O(n)],
+  [Quick Sort], [O(n log n)], [O(n log n)], [O(n²)], [O(log n)],
+)
 
 #dtu-highlight([
   Merge sort has consistent O(n log n) performance but requires additional space, while quick sort is usually faster in practice but has poor worst-case performance.
@@ -164,7 +179,9 @@ Design and implement a hash table with collision resolution.
 
 Implement a hash function for strings:
 
-```python
+#code-block(
+  caption: "String Hash Function")[
+  ```python
 def hash_function(key, table_size):
     """
     Simple polynomial hash function for strings.
@@ -173,13 +190,16 @@ def hash_function(key, table_size):
     for i, char in enumerate(key):
         hash_value += ord(char) * (31 ** i)
     return hash_value % table_size
-```
+  ```
+]
 
 == Part B: Collision Resolution (15 points)
 
 Implement chaining for collision resolution:
 
-```python
+#code-block(
+  caption: "Hash Table with Chaining")[
+  ```python
 class HashTable:
     def __init__(self, size=10):
         self.size = size
@@ -207,7 +227,8 @@ class HashTable:
                 return v
         
         raise KeyError(key)
-```
+  ```
+]
 
 #important([
   Explain how your collision resolution strategy affects the time complexity of hash table operations.
@@ -231,7 +252,9 @@ Given an array of integers and a target sum, find two numbers in the array that 
 
 == Solution
 
-```python
+#code-block(
+  caption: "Two Sum Algorithm - Hash Map Approach")[
+  ```python
 def two_sum(nums, target):
     """
     Find two numbers that sum to target using hash map approach.
@@ -248,7 +271,8 @@ def two_sum(nums, target):
         seen[num] = i
     
     return []  # No solution found
-```
+  ```
+]
 
 == Analysis
 

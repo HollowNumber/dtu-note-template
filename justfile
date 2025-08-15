@@ -1,4 +1,6 @@
 # DTU Template Development Justfile
+# Cross-platform recipes for Windows, macOS, and Linux
+# Requires: just (command runner) and typst (typesetting system)
 # Usage: just <recipe>
 
 # Default recipe - show help
@@ -11,7 +13,7 @@ help:
     @echo ""
     @echo "Development:"
     @echo "  setup     - Create test directory and validate dependencies"
-    @echo "  dev       - Development workflow (setup + examples)"
+    @echo "  dev       - Development workflow (setup + examples)"  
     @echo "  test      - Test template compilation"
     @echo "  clean     - Clean generated files"
     @echo ""
@@ -20,26 +22,28 @@ help:
     @echo ""
     @echo "Validation:"
     @echo "  validate  - Check package structure"
+    @echo ""
+    @echo "Platform: Cross-platform (Windows/macOS/Linux)"
 
-# Setup development environment
+# Setup development environment (cross-platform)
 setup:
     @echo "Setting up development environment..."
-    @powershell -Command "if (!(Test-Path 'test-output')) { New-Item -ItemType Directory -Path 'test-output' | Out-Null }"
+    @mkdir -p test-output
     @typst --version
     @echo "Setup complete!"
 
-# Validate package structure
+# Validate package structure (cross-platform)
 validate:
     @echo "Validating package structure..."
-    @powershell -Command "if (!(Test-Path 'typst.toml')) { Write-Error 'Missing typst.toml'; exit 1 }"
-    @powershell -Command "if (!(Test-Path 'src/lib.typ')) { Write-Error 'Missing src/lib.typ'; exit 1 }"
-    @powershell -Command "if (!(Test-Path 'src/misc/dtu-logo-cmyk.png')) { Write-Error 'Missing DTU logo'; exit 1 }"
+    @test -f typst.toml || (echo "Error: Missing typst.toml" && exit 1)
+    @test -f src/lib.typ || (echo "Error: Missing src/lib.typ" && exit 1)
+    @test -f src/misc/dtu-logo-cmyk.png || (echo "Error: Missing DTU logo" && exit 1)
     @echo "Package structure valid!"
 
-# Clean generated files
+# Clean generated files (cross-platform)
 clean:
     @echo "Cleaning generated files..."
-    @powershell -Command "if (Test-Path 'test-output') { Remove-Item -Recurse -Force 'test-output' }"
+    @rm -rf test-output
     @echo "Clean complete!"
 
 # Compile example documents
@@ -49,15 +53,15 @@ examples: setup
     @typst compile --root . "examples/assignment-example.typ" "test-output/assignment-example.pdf"
     @echo "Examples compiled to test-output/"
 
-# Test template compilation
+# Test template compilation (cross-platform)
 test: setup validate
     @echo "Testing template compilation..."
-    @echo "#import \"../src/lib.typ\": dtu-note" > test-output/test.typ
-    @echo "" >> test-output/test.typ  
-    @echo "#show: dtu-note.with(course: \"TEST\", title: \"Test\")" >> test-output/test.typ
-    @echo "" >> test-output/test.typ
-    @echo "= Test" >> test-output/test.typ
-    @echo "This is a test." >> test-output/test.typ
+    @echo '#import "../src/lib.typ": dtu-note' > test-output/test.typ
+    @echo '' >> test-output/test.typ  
+    @echo '#show: dtu-note.with(course: "TEST", title: "Test")' >> test-output/test.typ
+    @echo '' >> test-output/test.typ
+    @echo '= Test' >> test-output/test.typ
+    @echo 'This is a test.' >> test-output/test.typ
     @typst compile --root . "test-output/test.typ" "test-output/test.pdf"
     @echo "Test compilation successful!"
 
