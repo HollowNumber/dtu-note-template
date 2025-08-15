@@ -39,6 +39,7 @@ env/
 build/
 dist/
 out/
+test-output/ 
 
 # Test output
 test-examples/
