@@ -1,4 +1,4 @@
-name: Publish to Typst Universe
+name: Create Package Release
 
 on:
   release:
@@ -12,7 +12,7 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    name: Create Package and Submit to Typst Universe
+    name: Create and Package Template
 
     steps:
       - name: Checkout repository
@@ -144,12 +144,12 @@ jobs:
             dtu-template-${{ env.VERSION }}.tar.gz
           retention-days: 30
 
-      - name: Create submission info
+      - name: Create package summary
         run: |
           VERSION=${{ env.VERSION }}
-          echo "🚀 Package ready for Typst Universe submission!"
+          echo "� Package created successfully!"
           echo ""
-          echo "📋 Submission Details:"
+          echo "📋 Release Details:"
           echo "Repository: ${{ github.repository }}"
           echo "Version: $VERSION"
           if [ "${{ github.event_name }}" = "release" ]; then
@@ -162,46 +162,4 @@ jobs:
           echo "✓ dtu-template/$VERSION/lib.typ (main library)"
           echo "✓ dtu-template/$VERSION/misc/ (assets)"
           echo ""
-          echo "📝 To complete the submission:"
-          echo "1. Visit https://typst.app/universe/submit"
-          echo "2. Enter repository URL: https://github.com/${{ github.repository }}"
-          if [ "${{ github.event_name }}" = "release" ]; then
-            echo "3. Specify tag: ${{ github.ref_name }}"
-          else
-            echo "3. Use the main branch or create a release tag"
-          fi
-          echo "4. Follow the submission process"
-          echo ""
-          echo "✅ Package structure matches Typst Universe requirements!"
-
-      - name: Comment on release (if applicable)
-        if: github.event_name == 'release'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const version = process.env.VERSION;
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `🚀 Package validation successful for version ${version}! 
-              
-              **Ready for Typst Universe submission:**
-              
-              📦 **Package Structure:**
-              - \`dtu-template/typst.toml\` (root configuration)
-              - \`dtu-template/${version}/\` (versioned package files)
-              - \`dtu-template/${version}/lib.typ\` (main library)
-              - \`dtu-template/${version}/misc/\` (assets)
-              
-              📝 **Submission Steps:**
-              1. Visit https://typst.app/universe/submit
-              2. Enter repository URL: https://github.com/${context.repo.owner}/${context.repo.repo}
-              3. Specify tag: ${context.ref.replace('refs/tags/', '')}
-              4. Complete the submission process
-              
-              ✅ The package has been validated and is ready for submission.
-              📦 Release archive: \`dtu-template-${version}.tar.gz\``
-            })
-        env:
-          VERSION: ${{ env.VERSION }}
+          echo "✅ Package ready for distribution!"
