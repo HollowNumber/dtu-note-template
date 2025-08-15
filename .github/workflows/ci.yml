@@ -32,7 +32,7 @@ jobs:
 
           echo "🔍 Validating package structure..."
           # Check required files exist
-          for file in "typst.toml" "src/lib.typ" "src/misc/dtu-logo-cmyk.png"; do
+          for file in "typst.toml" "src/lib.typ" "src/assets/dtu-logo-cmyk.png"; do
             if [ ! -f "$file" ]; then
               echo "❌ Error: Required file $file is missing"
               exit 1

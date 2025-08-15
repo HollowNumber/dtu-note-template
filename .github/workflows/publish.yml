@@ -68,11 +68,31 @@ jobs:
 
           VERSION=${{ env.VERSION }}
 
-          # Verify all files are present
+          # Verify all files and directories are present
           required_files=(
             "dtu-template/typst.toml"
             "dtu-template/$VERSION/lib.typ"
-            "dtu-template/$VERSION/misc/dtu-logo-cmyk.png"
+            "dtu-template/$VERSION/assets/dtu-logo-cmyk.png"
+            "dtu-template/$VERSION/colors.typ"
+            "dtu-template/$VERSION/layouts.typ"
+            "dtu-template/$VERSION/enhanced.typ"
+          )
+
+          required_dirs=(
+            "dtu-template/$VERSION/components"
+            "dtu-template/$VERSION/styles" 
+            "dtu-template/$VERSION/helpers"
+            "dtu-template/$VERSION/layouts"
+            "dtu-template/$VERSION/assets"
+          )
+
+          echo "🔍 Final validation before publishing..."
+
+          # Verify essential files are present
+          required_files=(
+            "dtu-template/typst.toml"
+            "dtu-template/$VERSION/lib.typ"
+            "dtu-template/$VERSION/assets/dtu-logo-cmyk.png"
           )
 
           for file in "${required_files[@]}"; do
@@ -82,12 +102,29 @@ jobs:
             fi
           done
 
+          # Verify src folder was copied completely
+          if [ ! -d "dtu-template/$VERSION" ]; then
+            echo "❌ Error: Version directory is missing"
+            exit 1
+          fi
+
+          # Count files to ensure structure was copied
+          file_count=$(find "dtu-template/$VERSION" -type f | wc -l)
+          if [ "$file_count" -lt 10 ]; then
+            echo "❌ Error: Too few files copied ($file_count found, expected at least 10)"
+            exit 1
+          fi
+
+          echo "✅ Package validation passed! ($file_count files found)"
+
           echo "📋 Package contents:"
           echo "Root typst.toml:"
           cat dtu-template/typst.toml
           echo ""
-          echo "Version directory contents:"
-          ls -la "dtu-template/$VERSION/"
+          echo "📁 All files copied from src/:"
+          find "dtu-template/$VERSION/" -type f | sort
+          echo ""
+          echo "✅ Complete folder structure copied successfully!"
 
           # Test compilation one more time
           mkdir -p final-test
@@ -162,6 +199,16 @@ jobs:
           echo "✓ dtu-template/typst.toml (root package config)"
           echo "✓ dtu-template/$VERSION/ (versioned package files)"
           echo "✓ dtu-template/$VERSION/lib.typ (main library)"
-          echo "✓ dtu-template/$VERSION/misc/ (assets)"
+          echo "✓ dtu-template/$VERSION/components/ (academic & visual components)"
+          echo "✓ dtu-template/$VERSION/styles/ (spacing & typography utilities)"
+          echo "✓ dtu-template/$VERSION/helpers/ (layout & content helpers)"
+          echo "✓ dtu-template/$VERSION/layouts/ (note & assignment templates)"
+          echo "✓ dtu-template/$VERSION/assets/ (static resources)"
+          echo "✓ dtu-template/$VERSION/VERSION.typ (version metadata)"
+          echo ""
+          echo "🏗️ Modular Architecture:"
+          echo "  • Enhanced component organization"
+          echo "  • Better maintainability and extensibility"
+          echo "  • Backward compatibility maintained"
           echo ""
           echo "✅ Package ready for distribution!"

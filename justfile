@@ -33,7 +33,7 @@ validate:
     @echo "Validating package structure..."
     @powershell -Command "if (!(Test-Path 'typst.toml')) { Write-Error 'Missing typst.toml'; exit 1 }"
     @powershell -Command "if (!(Test-Path 'src/lib.typ')) { Write-Error 'Missing src/lib.typ'; exit 1 }"
-    @powershell -Command "if (!(Test-Path 'src/misc/dtu-logo-cmyk.png')) { Write-Error 'Missing DTU logo'; exit 1 }"
+    @powershell -Command "if (!(Test-Path 'src/assets/dtu-logo-cmyk.png')) { Write-Error 'Missing DTU logo'; exit 1 }"
     @echo "Package structure valid!"
 
 # Clean generated files
