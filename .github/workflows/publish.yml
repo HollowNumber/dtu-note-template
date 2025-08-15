@@ -9,6 +9,10 @@ on:
         description: "Version to publish (leave empty to read from typst.toml)"
         required: false
 
+permissions:
+  contents: write
+  actions: read
+
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -126,14 +130,12 @@ jobs:
 
       - name: Upload release asset
         if: github.event_name == 'release'
-        uses: actions/upload-release-asset@v1
+        run: |
+          echo "🚀 Uploading release asset..."
+          gh release upload ${{ github.ref_name }} "dtu-template-${{ env.VERSION }}.tar.gz" --clobber
+          echo "✅ Release asset uploaded successfully!"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./dtu-template-${{ env.VERSION }}.tar.gz
-          asset_name: dtu-template-${{ env.VERSION }}.tar.gz
-          asset_content_type: application/gzip
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload package artifact
         uses: actions/upload-artifact@v4
