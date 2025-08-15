@@ -1,11 +1,17 @@
 // DTU-themed Typst Template
 // Academic note-taking and assignment template following DTU design guidelines
-// Modular architecture with separate files for colors, layouts, components, etc.
+// Modular architecture with organized subfolders for different functionality
 
 // Import and re-export all modules
 #import "colors.typ": *
 #import "layouts.typ": *
-#import "components.typ": *
+#import "components/mod.typ": *
+#import "styles/mod.typ": *
+#import "helpers/mod.typ": *
 #import "enhanced.typ": *
+
+// Deprecated compatibility imports (will be removed in future versions)
+// Keep existing single-file imports working for backward compatibility
+#import "components.typ": *
 #import "utils.typ": *
 

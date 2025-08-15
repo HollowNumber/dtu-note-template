@@ -7,6 +7,58 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Planned
+
+- Additional content box styles
+- Support for multi-language documents
+- Extended integration with dtu-notes CLI
+- Custom color theme support
+
+## [0.3.0] - 2025-08-15
+
+### Added
+
+- **Modular Architecture**: Complete reorganization into logical folders
+  - `src/components/` - Academic and visual components split into submodules
+  - `src/styles/` - Spacing and typography utilities
+  - `src/helpers/` - Layout and content management utilities
+  - `src/layouts/` - Individual layout files with better organization
+  - `src/assets/` - Renamed from `misc/` for better clarity
+- **Enhanced Component System**:
+  - `academic.typ`: definitions, theorems, examples
+  - `visual.typ`: boxes, highlights, visual elements
+- **Styling System**:
+  - `spacing.typ`: consistent spacing helpers and constants
+  - `typography.typ`: text styling and emphasis utilities
+- **Layout Helpers**:
+  - `layout.typ`: grid, column, and layout utilities
+  - `content.typ`: figure, list, and content helpers
+- **Documentation & Metadata**:
+  - `VERSION.typ`: centralized version management
+  - `src/README.md`: comprehensive architecture documentation
+- **Just Task Runner Integration**: Cross-platform development workflow
+- **GitHub Actions CI/CD**: Automated testing and release pipeline
+- **Enhanced Examples**: Updated examples showcasing new features
+
+### Changed
+
+- **Breaking**: Reorganized folder structure for better maintainability
+- **Asset Path**: Moved logo from `misc/` to `assets/` folder
+- **Import Structure**: New modular imports available (backward compatible)
+- **Build System**: Integrated Just task runner for development workflow
+
+### Fixed
+
+- Cross-platform font compatibility with robust fallbacks
+- Asset path resolution in CI/CD environments
+- Layout template organization and modularity
+
+### Deprecated
+
+- Legacy single-file modules (`components.typ`, `utils.typ`) - still functional for backward compatibility
+
+## [0.2.0] - 2025-08-15
+
 ### Changed
 
 - Removed built-in course database functionality
