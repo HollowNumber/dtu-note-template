@@ -1,0 +1,207 @@
+name: Publish to Typst Universe
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to publish (leave empty to read from typst.toml)"
+        required: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    name: Create Package and Submit to Typst Universe
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Typst
+        uses: typst-community/setup-typst@v3
+        with:
+          typst-version: latest
+
+      - name: Extract version and create package structure
+        run: |
+          echo "📋 Extracting version from typst.toml..."
+
+          # Extract version from typst.toml
+          VERSION=$(grep 'version.*=' typst.toml | cut -d'"' -f2)
+          echo "Package version: $VERSION"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+          # Use manual version if provided
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+            echo "Using manual version: $VERSION"
+            echo "VERSION=$VERSION" >> $GITHUB_ENV
+          fi
+
+          echo "📦 Creating package structure for version $VERSION..."
+
+          # Create the package directory structure
+          mkdir -p "dtu-template/$VERSION"
+
+          # Copy src directory contents to versioned directory
+          cp -r src/* "dtu-template/$VERSION/"
+
+          # Create root typst.toml with correct version
+          cp typst.toml dtu-template/
+
+          # Update version in the root typst.toml if manual version provided
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            sed -i "s/version = \".*\"/version = \"$VERSION\"/" dtu-template/typst.toml
+          fi
+
+          echo "📄 Package structure created:"
+          find dtu-template -type f | sort
+
+      - name: Validate package before publishing
+        run: |
+          echo "🔍 Final validation before publishing..."
+
+          VERSION=${{ env.VERSION }}
+
+          # Verify all files are present
+          required_files=(
+            "dtu-template/typst.toml"
+            "dtu-template/$VERSION/lib.typ"
+            "dtu-template/$VERSION/misc/dtu-logo-cmyk.png"
+          )
+
+          for file in "${required_files[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "❌ Error: Required file $file is missing"
+              exit 1
+            fi
+          done
+
+          echo "📋 Package contents:"
+          echo "Root typst.toml:"
+          cat dtu-template/typst.toml
+          echo ""
+          echo "Version directory contents:"
+          ls -la "dtu-template/$VERSION/"
+
+          # Test compilation one more time
+          mkdir -p final-test
+          cat > final-test/test.typ << EOF
+          #import "../dtu-template/$VERSION/lib.typ": dtu-note
+
+          #show: dtu-note.with(
+            course: "02101",
+            title: "Final Test",
+            author: "CI Test"
+          )
+
+          = Test
+          This is a final compilation test before publishing.
+          EOF
+
+          cd final-test
+          typst compile --root .. test.typ test.pdf
+
+          if [ $? -eq 0 ]; then
+            echo "✅ Final compilation test passed"
+          else
+            echo "❌ Final compilation test failed"
+            exit 1
+          fi
+
+      - name: Create release archive
+        run: |
+          VERSION=${{ env.VERSION }}
+          echo "📦 Creating release archive..."
+
+          # Create tarball for release
+          tar -czf "dtu-template-$VERSION.tar.gz" dtu-template/
+
+          echo "✅ Archive created: dtu-template-$VERSION.tar.gz"
+
+          # Display archive contents
+          echo "📄 Archive contents:"
+          tar -tzf "dtu-template-$VERSION.tar.gz" | head -20
+
+      - name: Upload release asset
+        if: github.event_name == 'release'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./dtu-template-${{ env.VERSION }}.tar.gz
+          asset_name: dtu-template-${{ env.VERSION }}.tar.gz
+          asset_content_type: application/gzip
+
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dtu-template-package
+          path: |
+            dtu-template/
+            dtu-template-${{ env.VERSION }}.tar.gz
+          retention-days: 30
+
+      - name: Create submission info
+        run: |
+          VERSION=${{ env.VERSION }}
+          echo "🚀 Package ready for Typst Universe submission!"
+          echo ""
+          echo "📋 Submission Details:"
+          echo "Repository: ${{ github.repository }}"
+          echo "Version: $VERSION"
+          if [ "${{ github.event_name }}" = "release" ]; then
+            echo "Tag: ${{ github.ref_name }}"
+          fi
+          echo ""
+          echo "📦 Package Structure:"
+          echo "✓ dtu-template/typst.toml (root package config)"
+          echo "✓ dtu-template/$VERSION/ (versioned package files)"
+          echo "✓ dtu-template/$VERSION/lib.typ (main library)"
+          echo "✓ dtu-template/$VERSION/misc/ (assets)"
+          echo ""
+          echo "📝 To complete the submission:"
+          echo "1. Visit https://typst.app/universe/submit"
+          echo "2. Enter repository URL: https://github.com/${{ github.repository }}"
+          if [ "${{ github.event_name }}" = "release" ]; then
+            echo "3. Specify tag: ${{ github.ref_name }}"
+          else
+            echo "3. Use the main branch or create a release tag"
+          fi
+          echo "4. Follow the submission process"
+          echo ""
+          echo "✅ Package structure matches Typst Universe requirements!"
+
+      - name: Comment on release (if applicable)
+        if: github.event_name == 'release'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const version = process.env.VERSION;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `🚀 Package validation successful for version ${version}! 
+              
+              **Ready for Typst Universe submission:**
+              
+              📦 **Package Structure:**
+              - \`dtu-template/typst.toml\` (root configuration)
+              - \`dtu-template/${version}/\` (versioned package files)
+              - \`dtu-template/${version}/lib.typ\` (main library)
+              - \`dtu-template/${version}/misc/\` (assets)
+              
+              📝 **Submission Steps:**
+              1. Visit https://typst.app/universe/submit
+              2. Enter repository URL: https://github.com/${context.repo.owner}/${context.repo.repo}
+              3. Specify tag: ${context.ref.replace('refs/tags/', '')}
+              4. Complete the submission process
+              
+              ✅ The package has been validated and is ready for submission.
+              📦 Release archive: \`dtu-template-${version}.tar.gz\``
+            })
+        env:
+          VERSION: ${{ env.VERSION }}

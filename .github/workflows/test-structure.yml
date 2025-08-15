@@ -1,0 +1,66 @@
+name: Test Package Structure
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-structure:
+    runs-on: ubuntu-latest
+    name: Test New Package Structure
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Typst
+        uses: typst-community/setup-typst@v3
+        with:
+          typst-version: latest
+
+      - name: Test package creation
+        run: |
+          echo "🧪 Testing package creation process..."
+
+          # Extract version
+          VERSION=$(grep 'version.*=' typst.toml | cut -d'"' -f2)
+          echo "Version: $VERSION"
+
+          # Create package structure
+          mkdir -p "dtu-template/$VERSION"
+          cp -r src/* "dtu-template/$VERSION/"
+          cp typst.toml dtu-template/
+
+          # Show structure
+          echo "📁 Package structure:"
+          find dtu-template -type f | sort
+
+          # Test compilation
+          echo "🔧 Testing compilation..."
+          cat > test.typ << EOF
+          #import "dtu-template/$VERSION/lib.typ": dtu-note
+
+          #show: dtu-note.with(
+            course: "TEST",
+            title: "Structure Test"
+          )
+
+          = Test
+          This tests the new structure.
+          EOF
+
+          typst compile test.typ test.pdf
+
+          if [ $? -eq 0 ]; then
+            echo "✅ Package structure test passed!"
+          else
+            echo "❌ Package structure test failed!"
+            exit 1
+          fi
+
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: structure-test
+          path: |
+            dtu-template/
+            test.pdf

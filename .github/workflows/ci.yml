@@ -1,0 +1,203 @@
+name: Build and Test Typst Package
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Test Template
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Typst
+        uses: typst-community/setup-typst@v3
+        with:
+          typst-version: latest
+
+      - name: Setup Just
+        uses: extractions/setup-just@v2
+
+      - name: Run CI pipeline
+        run: |
+          echo "🎯 Running comprehensive CI pipeline..."
+
+          echo "🔧 Setting up environment..."
+          mkdir -p test-output
+
+          echo "🔍 Validating package structure..."
+          # Check required files exist
+          for file in "typst.toml" "src/lib.typ" "src/misc/dtu-logo-cmyk.png"; do
+            if [ ! -f "$file" ]; then
+              echo "❌ Error: Required file $file is missing"
+              exit 1
+            fi
+          done
+
+          # Validate package configuration
+          if ! grep -q 'name.*=.*"dtu-template"' typst.toml; then
+            echo "❌ Error: Invalid package name in typst.toml"
+            exit 1
+          fi
+
+          # Extract version from typst.toml
+          VERSION=$(grep 'version.*=' typst.toml | cut -d'"' -f2)
+          echo "📋 Package version: $VERSION"
+
+          echo "✅ Package structure validated"
+
+          echo "🧪 Running quick compilation test..."
+          # Create minimal test document
+          cat > test-output/quick-test.typ << 'EOF'
+          #import "../src/lib.typ": dtu-note
+
+          #show: dtu-note.with(
+            course: "TEST",
+            title: "CI Quick Test",
+            author: "GitHub Actions"
+          )
+
+          = Test
+          This is a minimal CI test document.
+          EOF
+
+          typst compile --root . test-output/quick-test.typ test-output/quick-test.pdf
+          echo "✅ Quick compilation test passed"
+
+          echo "🎨 Testing template features..."
+          # Create comprehensive feature test
+          cat > test-output/feature-test.typ << 'EOF'
+          #import "../src/lib.typ": dtu-note, definition, theorem, example, important, note-box, dtu-highlight
+
+          #show: dtu-note.with(
+            course: "TEST101",
+            course-name: "CI Feature Testing",
+            title: "Template Feature Test",
+            author: "GitHub Actions"
+          )
+
+          = Content Boxes Test
+
+          #definition("Test Definition", [This tests the definition box styling.])
+
+          #theorem(name: "Test Theorem", [This tests the theorem box with a name.])
+
+          #example([This is an example box test.])
+
+          #important([This is an important notice test.])
+
+          #note-box([This is a note box test.])
+
+          #dtu-highlight([This is a highlight box test.])
+
+          = Typography Test
+
+          This tests *bold*, _italic_, and `code` formatting.
+
+          == Mathematical Content
+
+          Here is an inline equation: $f(x) = x^2 + 1$
+
+          Display equation:
+          $ sum_(i=1)^n i = (n(n+1))/2 $
+          EOF
+
+          typst compile --root . test-output/feature-test.typ test-output/feature-test.pdf
+          echo "✅ Feature test passed"
+
+          echo "📝 Compiling example documents..."
+          typst compile --root . examples/note-example.typ test-output/note-example.pdf
+          typst compile --root . examples/assignment-example.typ test-output/assignment-example.pdf
+          echo "✅ All examples compiled successfully"
+
+          echo "🔍 Running code quality checks..."
+          # Basic linting - check for tabs in .typ files
+          if find . -name "*.typ" -exec grep -l $'\t' {} \;; then
+            echo "⚠️  Warning: Found tabs in .typ files - consider using spaces"
+          fi
+
+          echo "✅ All CI checks passed!"
+
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-pdfs
+          path: test-output/*.pdf
+          retention-days: 30
+
+  validate-package:
+    runs-on: ubuntu-latest
+    name: Validate Package Configuration
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate typst.toml
+        run: |
+          echo "🔍 Validating package configuration..."
+
+          if [ ! -f "typst.toml" ]; then
+            echo "❌ Error: typst.toml not found"
+            exit 1
+          fi
+
+          # Display configuration
+          echo "📄 Package configuration:"
+          cat typst.toml
+
+          # Check required fields
+          if ! grep -q "name.*=.*\"dtu-template\"" typst.toml; then
+            echo "❌ Error: Package name not found or incorrect"
+            exit 1
+          fi
+
+          if ! grep -q "version.*=.*\".*\"" typst.toml; then
+            echo "❌ Error: Version not found"
+            exit 1
+          fi
+
+          if ! grep -q "entrypoint.*=.*\"src/lib.typ\"" typst.toml; then
+            echo "❌ Error: Entrypoint not found or incorrect"
+            exit 1
+          fi
+
+          echo "✅ Package configuration is valid!"
+
+  lint:
+    runs-on: ubuntu-latest
+    name: Lint and Style Check
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check code style and documentation
+        run: |
+          echo "🔍 Running lint checks..."
+
+          # Check for consistent file structure
+          echo "Checking file structure..."
+          find . -name "*.typ" -type f | head -10
+
+          # Check for basic markdown structure
+          if [ -f "README.md" ]; then
+            if ! head -1 README.md | grep -q "^# "; then
+              echo "⚠️  Warning: README.md should start with H1 heading"
+            else
+              echo "✅ README.md structure looks good"
+            fi
+          fi
+
+          # Check for trailing whitespace (basic check)
+          if find . -name "*.md" -o -name "*.typ" | xargs grep -l " $" 2>/dev/null; then
+            echo "⚠️  Warning: Found trailing whitespace in some files"
+          fi
+
+          echo "✅ Lint checks completed"
