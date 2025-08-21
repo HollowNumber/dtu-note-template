@@ -9,9 +9,9 @@
 #import "styles/mod.typ": *
 #import "helpers/mod.typ": *
 #import "enhanced.typ": *
+#import "variants/mod.typ": *
 
 // Deprecated compatibility imports (will be removed in future versions)
 // Keep existing single-file imports working for backward compatibility
 #import "components.typ": *
 #import "utils.typ": *
-

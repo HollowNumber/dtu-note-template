@@ -14,11 +14,6 @@ A professional Typst template package for Danish Technical University (DTU) stud
 
 ## Installation
 
-### From the Typst Universe (Recommended)
-
-```bash
-typst install dtu-template
-```
 
 ### Manual Installation
 
@@ -33,7 +28,7 @@ typst install dtu-template
 ### Notes Template
 
 ```typst
-#import "@local/dtu-template:0.1.0": dtu-note
+#import "@local/dtu-template:0.4.0": dtu-note
 
 #show: dtu-note.with(
   course: "02101",
@@ -78,7 +73,7 @@ Solve the following...
 The template provides several styled content boxes:
 
 ```typst
-#import "@local/dtu-template:0.1.0": definition, theorem, example, important, note-box, dtu-highlight
+#import "@local/dtu-template:0.4.0": definition, theorem, example, important, note-box, dtu-highlight
 
 #definition("Algorithm", [
   A step-by-step procedure for solving a problem.
@@ -140,22 +135,136 @@ The template includes all official DTU colors:
 - **Primary Colors**: DTU Red (#990000), White, Black
 - **Secondary Colors**: Blue (#2F3EEA), Green (#1FD082), Dark Blue (#030F4F), Yellow (#F6D04D), Orange (#FC7634), Salmon (#F7BBB1), Gray (#DADADA), Coral (#E83F48), Dark Green (#008835), Purple (#79238E)
 
-## CLI Integration
+## CLI Integration and Configuration
 
-This template is designed to work seamlessly with the [dtu-notes](https://github.com/HollowNumber/dtu-notes) Rust CLI tool, which provides:
+This template is designed to work seamlessly with the [dtu-notes](https://github.com/HollowNumber/dtu-notes) Rust CLI tool. The integration is configured through the `.noter.config.toml` file, which defines how the templates interact with the CLI system.
 
-- Automatic course name resolution from DTU course codes
-- Project initialization and management
-- Template generation with pre-filled course information
-- Integration with DTU course database
+### Configuration File Structure
+
+The `example.noter.config.toml` file in the `examples/` directory demonstrates a comprehensive configuration for the DTU Notes CLI integration. Here's what each section controls:
+
+#### Metadata Section
+```toml
+[metadata]
+name = "dtu-templates"
+version = "0.4.0"
+description = "Official DTU academic templates for notes and assignments"
+repository = "https://github.com/HollowNumber/dtu-template"
+author = "DTU Notes Team"
+license = "MIT"
+```
+
+This section identifies the template package and provides basic information about its source and licensing.
+
+#### Template Definitions
+```toml
+[[templates]]
+name = "lecture-note"
+display_name = "Lecture Notes"
+description = "Standard template for taking lecture notes with DTU branding"
+file = "lecture.typ"
+function = "lecture-template"
+supports_variants = true
+course_types = ["all"]
+default_sections = [
+    "Key Concepts",
+    "Mathematical Framework",
+    "Examples",
+    "Important Points",
+    "Questions & Follow-up"
+]
+```
+
+Each `[[templates]]` block defines an available template type with:
+- **name**: Internal identifier used in CLI commands
+- **display_name**: User-friendly name shown in help messages
+- **file**: Typst template file within the package
+- **function**: Typst function name to call when generating documents
+- **supports_variants**: Whether specialized variants exist for different course types
+- **course_types**: Which types of courses can use this template ("all" or specific types)
+- **default_sections**: Sections automatically created in new documents
+
+#### Template Variants
+```toml
+[[variants]]
+template = "assignment"
+name = "math-assignment"
+display_name = "Mathematical Assignment"
+course_types = ["math", "statistics", "engineering"]
+file = "src/variants/math-assignment.typ"
+function = "math-assignment-template"
+additional_sections = [
+    "Mathematical Proofs",
+    "Theoretical Analysis",
+    "Formula Derivations"
+]
+```
+
+Variants provide specialized versions of templates for specific course types:
+- **template**: References the base template name
+- **course_types**: Course patterns that trigger this variant
+- **additional_sections**: Extra sections added to the base template's default sections
+- **override_sections**: Completely replaces default sections if specified
+
+#### Course Type Mapping
+```toml
+[course_mapping]
+"01xxx" = "math"                    # Math courses (01005, 01006, etc.)
+"02xxx" = "programming"             # Computer Science (02101, 02102, etc.)
+"25xxx" = "physics"                 # Physics courses
+"22xxx" = "electronics"             # Electronics and electrical engineering
+```
+
+This section maps DTU course code patterns to course types, enabling automatic variant selection. For example, any course starting with "02" (like 02101, 02102) will be classified as "programming" and use programming-specific template variants.
+
+#### Engine Configuration
+```toml
+[engine]
+[engine.features]
+supports_conditionals = true
+supports_custom_sections = true
+supports_dynamic_content = true
+supports_expressions = false
+supported_formats = ["typst"]
+```
+
+The engine section controls template processing capabilities:
+- **features**: What template capabilities are enabled (conditionals, custom sections, etc.)
+- **compatibility**: Version requirements and platform support
+- **processing**: File encoding, line endings, and text processing settings
+- **variables**: Template variable substitution configuration
+- **validation**: Template checking and error reporting rules
+- **rendering**: Performance settings like caching and timeouts
+
+#### Built-in Variables
+The configuration defines several built-in variables always available in templates:
+- `author`: User's name from configuration
+- `date`: Current date
+- `course_id`: Course identifier (e.g., "02101")
+- `course_name`: Full course name
+- `title`: Document title
+- `semester`: Current semester string
+- `year`: Current year
+
+### Using the Configuration
+
+When you use the DTU Notes CLI with this template package:
+
+1. The CLI reads the `.noter.config.toml` file to understand available templates
+2. Based on your course code, it automatically selects appropriate template variants
+3. It provides the defined built-in variables to the Typst templates
+4. It creates documents with the default sections specified for each template type
+
+This integration provides a seamless experience where the CLI handles course-specific customization automatically while you focus on content creation.
 
 ## Examples
 
 Check the `examples/` directory for complete document samples:
 
-- Basic note template
+- Basic note template usage
 - Assignment with multiple problems
 - Advanced formatting examples
+- Complete CLI configuration file (`example.noter.config.toml`)
 
 ## Requirements
 
@@ -279,5 +388,5 @@ This is an unofficial template. While it follows DTU's official design guideline
 
 ---
 
-**Technical University of Denmark**  
+**Technical University of Denmark**
 _Developed by students, for students_

@@ -1,8 +1,9 @@
 name: Create Package Release
 
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - 'v*'
   workflow_dispatch:
     inputs:
       version:
@@ -14,9 +15,46 @@ permissions:
   actions: read
 
 jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    name: Create GitHub Release
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract version
+        id: version
+        run: |
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+            echo "Using manual version: $VERSION"
+          elif [ "${{ github.event_name }}" = "push" ] && [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            VERSION=${GITHUB_REF#refs/tags/v}
+            echo "Using tag version: $VERSION"
+          else
+            VERSION=$(grep 'version.*=' typst.toml | cut -d'"' -f2)
+            echo "Using typst.toml version: $VERSION"
+          fi
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: taiki-e/create-gh-release-action@v1
+        with:
+          changelog: CHANGELOG.md
+          title: DTU Template v${{ env.VERSION }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   publish:
     runs-on: ubuntu-latest
-    name: Create and Package Template
+    name: Build and Package Template
+    needs: create-release
 
     steps:
       - name: Checkout repository
@@ -27,22 +65,13 @@ jobs:
         with:
           typst-version: latest
 
-      - name: Extract version and create package structure
+      - name: Set version
         run: |
-          echo "📋 Extracting version from typst.toml..."
-
-          # Extract version from typst.toml
-          VERSION=$(grep 'version.*=' typst.toml | cut -d'"' -f2)
-          echo "Package version: $VERSION"
+          VERSION=${{ needs.create-release.outputs.version }}
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-          # Use manual version if provided
-          if [ -n "${{ github.event.inputs.version }}" ]; then
-            VERSION="${{ github.event.inputs.version }}"
-            echo "Using manual version: $VERSION"
-            echo "VERSION=$VERSION" >> $GITHUB_ENV
-          fi
-
+      - name: Create package structure
+        run: |
           echo "📦 Creating package structure for version $VERSION..."
 
           # Create the package directory structure
@@ -54,6 +83,11 @@ jobs:
           # Copy typst.toml to the version directory
           cp typst.toml "dtu-template/$VERSION/"
 
+          # Copy noter config if it exists
+          if [ -f ".noter.config.toml" ]; then
+            cp .noter.config.toml "dtu-template/$VERSION/"
+          fi
+
           # Update version in the typst.toml if manual version provided
           if [ -n "${{ github.event.inputs.version }}" ]; then
             sed -i "s/version = \".*\"/version = \"$VERSION\"/" "dtu-template/$VERSION/typst.toml"
@@ -62,32 +96,12 @@ jobs:
           echo "📄 Package structure created:"
           find dtu-template -type f | sort
 
-      - name: Validate package before publishing
+      - name: Validate package
         run: |
           echo "🔍 Final validation before publishing..."
 
           VERSION=${{ env.VERSION }}
 
-          # Verify all files and directories are present
-          required_files=(
-            "dtu-template/$VERSION/typst.toml"
-            "dtu-template/$VERSION/src/lib.typ"
-            "dtu-template/$VERSION/src/assets/dtu-logo-cmyk.png"
-            "dtu-template/$VERSION/src/colors.typ"
-            "dtu-template/$VERSION/src/layouts.typ"
-            "dtu-template/$VERSION/src/enhanced.typ"
-          )
-
-          required_dirs=(
-            "dtu-template/$VERSION/src/components"
-            "dtu-template/$VERSION/src/styles"
-            "dtu-template/$VERSION/src/helpers"
-            "dtu-template/$VERSION/src/layouts"
-            "dtu-template/$VERSION/src/assets"
-          )
-
-          echo "🔍 Final validation before publishing..."
-          
           # Verify essential files are present
           required_files=(
             "dtu-template/$VERSION/typst.toml"
@@ -120,14 +134,7 @@ jobs:
             exit 1
           fi
 
-          echo "✅ Package validation passed! ($file_count files found in src/)"          echo "📋 Package contents:"
-          echo "Version typst.toml:"
-          cat "dtu-template/$VERSION/typst.toml"
-          echo ""
-          echo "📁 All files copied from src/ to src/ subdirectory:"
-          find "dtu-template/$VERSION/src/" -type f | sort
-          echo ""
-          echo "✅ Complete folder structure with version-specific typst.toml!"
+          echo "✅ Package validation passed! ($file_count files found in src/)"
 
           # Test compilation one more time
           mkdir -p final-test
@@ -169,10 +176,9 @@ jobs:
           tar -tzf "dtu-template-$VERSION.tar.gz" | head -20
 
       - name: Upload release asset
-        if: github.event_name == 'release'
         run: |
           echo "🚀 Uploading release asset..."
-          gh release upload ${{ github.ref_name }} "dtu-template-${{ env.VERSION }}.tar.gz" --clobber
+          gh release upload v${{ env.VERSION }} "dtu-template-${{ env.VERSION }}.tar.gz" --clobber
           echo "✅ Release asset uploaded successfully!"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -180,7 +186,7 @@ jobs:
       - name: Upload package artifact
         uses: actions/upload-artifact@v4
         with:
-          name: dtu-template-package
+          name: dtu-template-package-v${{ env.VERSION }}
           path: |
             dtu-template/
             dtu-template-${{ env.VERSION }}.tar.gz
@@ -189,14 +195,205 @@ jobs:
       - name: Create package summary
         run: |
           VERSION=${{ env.VERSION }}
-          echo "� Package created successfully!"
+          echo "🎉 Package created successfully!"
           echo ""
           echo "📋 Release Details:"
-          echo "Repository: ${{ github.repository }}"
+          echo "Repository: ${{ github.repository }}"name: Create Package Release
+
+          on:
+            push:
+              tags:
+                - 'v*'
+            workflow_dispatch:
+              inputs:
+                version:
+                  description: "Version to publish (leave empty to read from typst.toml)"
+                  required: false
+
+          permissions:
+            contents: write
+            actions: read
+
+          jobs:
+            create-release:
+              runs-on: ubuntu-latest
+              name: Create GitHub Release
+              outputs:
+                version: ${{ steps.version.outputs.version }}
+
+              steps:
+                - name: Checkout repository
+                  uses: actions/checkout@v4
+
+                - name: Extract version
+                  id: version
+                  run: |
+                    if [ -n "${{ github.event.inputs.version }}" ]; then
+                      VERSION="${{ github.event.inputs.version }}"
+                      echo "Using manual version: $VERSION"
+                    elif [ "${{ github.event_name }}" = "push" ] && [[ "${{ github.ref }}" == refs/tags/* ]]; then
+                      VERSION=${GITHUB_REF#refs/tags/v}
+                      echo "Using tag version: $VERSION"
+                    else
+                      VERSION=$(grep 'version.*=' typst.toml | cut -d'"' -f2)
+                      echo "Using typst.toml version: $VERSION"
+                    fi
+                    echo "VERSION=$VERSION" >> $GITHUB_ENV
+                    echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+                - name: Create GitHub Release
+                  uses: taiki-e/create-gh-release-action@v1
+                  with:
+                    changelog: CHANGELOG.md
+                    title: DTU Template v${{ env.VERSION }}
+                    draft: false
+                    prerelease: false
+                  env:
+                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+            publish:
+              runs-on: ubuntu-latest
+              name: Build and Package Template
+              needs: create-release
+
+              steps:
+                - name: Checkout repository
+                  uses: actions/checkout@v4
+
+                - name: Setup Typst
+                  uses: typst-community/setup-typst@v3
+                  with:
+                    typst-version: latest
+
+                - name: Set version
+                  run: |
+                    VERSION=${{ needs.create-release.outputs.version }}
+                    echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+                - name: Create package structure
+                  run: |
+                    echo "📦 Creating package structure for version $VERSION..."
+
+                    # Create the package directory structure
+                    mkdir -p "dtu-template/$VERSION/src"
+
+                    # Copy src directory contents to versioned src directory
+                    cp -r src/* "dtu-template/$VERSION/src/"
+
+                    # Copy typst.toml to the version directory
+                    cp typst.toml "dtu-template/$VERSION/"
+
+                    # Copy noter config if it exists
+                    if [ -f ".noter.config.toml" ]; then
+                      cp .noter.config.toml "dtu-template/$VERSION/"
+                    fi
+
+                    # Update version in the typst.toml if manual version provided
+                    if [ -n "${{ github.event.inputs.version }}" ]; then
+                      sed -i "s/version = \".*\"/version = \"$VERSION\"/" "dtu-template/$VERSION/typst.toml"
+                    fi
+
+                    echo "📄 Package structure created:"
+                    find dtu-template -type f | sort
+
+                - name: Validate package
+                  run: |
+                    echo "🔍 Final validation before publishing..."
+
+                    VERSION=${{ env.VERSION }}
+
+                    # Verify essential files are present
+                    required_files=(
+                      "dtu-template/$VERSION/typst.toml"
+                      "dtu-template/$VERSION/src/lib.typ"
+                      "dtu-template/$VERSION/src/assets/dtu-logo-cmyk.png"
+                    )
+
+                    for file in "${required_files[@]}"; do
+                      if [ ! -f "$file" ]; then
+                        echo "❌ Error: Required file $file is missing"
+                        exit 1
+                      fi
+                    done
+
+                    # Verify version directory and src subdirectory exist
+                    if [ ! -d "dtu-template/$VERSION" ]; then
+                      echo "❌ Error: Version directory is missing"
+                      exit 1
+                    fi
+
+                    if [ ! -d "dtu-template/$VERSION/src" ]; then
+                      echo "❌ Error: src subdirectory is missing"
+                      exit 1
+                    fi
+
+                    # Count files to ensure structure was copied
+                    file_count=$(find "dtu-template/$VERSION/src" -type f | wc -l)
+                    if [ "$file_count" -lt 10 ]; then
+                      echo "❌ Error: Too few files copied ($file_count found, expected at least 10)"
+                      exit 1
+                    fi
+
+                    echo "✅ Package validation passed! ($file_count files found in src/)"
+
+                    # Test compilation one more time
+                    mkdir -p final-test
+                    cat > final-test/test.typ << EOF
+                    #import "../dtu-template/$VERSION/src/lib.typ": dtu-note
+
+                    #show: dtu-note.with(
+                      course: "02101",
+                      title: "Final Test",
+                      author: "CI Test"
+                    )
+
+                    = Test
+                    This is a final compilation test before publishing.
+                    EOF
+
+                    cd final-test
+                    typst compile --root .. test.typ test.pdf
+
+                    if [ $? -eq 0 ]; then
+                      echo "✅ Final compilation test passed"
+                    else
+                      echo "❌ Final compilation test failed"
+                      exit 1
+                    fi
+
+                - name: Create release archive
+                  run: |
+                    VERSION=${{ env.VERSION }}
+                    echo "📦 Creating release archive..."
+
+                    # Create tarball for release
+                    tar -czf "dtu-template-$VERSION.tar.gz" dtu-template/
+
+                    echo "✅ Archive created: dtu-template-$VERSION.tar.gz"
+
+                    # Display archive contents
+                    echo "📄 Archive contents:"
+                    tar -tzf "dtu-template-$VERSION.tar.gz" | head -20
+
+                - name: Upload release asset
+                  run: |
+                    echo "🚀 Uploading release asset..."
+                    gh release upload v${{ env.VERSION }} "dtu-template-${{ env.VERSION }}.tar.gz" --clobber
+                    echo "✅ Release asset uploaded successfully!"
+                  env:
+                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+                - name: Upload package artifact
+                  uses: actions/upload-artifact@v4
+                  with:
+                    name: dtu-template-package-v${{ env.VERSION }}
+                    path: |
+                      dtu-template/
+                      dtu-template-${{ env.VERSION }}.tar.gz
+                    retention-days: 30
+
           echo "Version: $VERSION"
-          if [ "${{ github.event_name }}" = "release" ]; then
-            echo "Tag: ${{ github.ref_name }}"
-          fi
+          echo "Tag: v$VERSION"
           echo ""
           echo "📦 Package Structure:"
           echo "✓ dtu-template/$VERSION/typst.toml (version-specific package config)"
@@ -215,3 +412,5 @@ jobs:
           echo "  • Version-specific typst.toml configuration"
           echo ""
           echo "✅ Package ready for distribution!"
+          echo ""
+          echo "🔗 Release available at: https://github.com/${{ github.repository }}/releases/tag/v$VERSION"

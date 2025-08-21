@@ -1,0 +1,121 @@
+# DTU Notes Template Package Configuration
+# This file defines templates, their capabilities, and engine configuration
+# for the DTU Notes CLI template system.
+
+[metadata]
+# Package identification
+name = "dtu-templates"                                    # Template package name
+version = "0.4.0"                                        # Template package version
+description = "Unofficial DTU academic templates for notes and assignments"  # Package description
+repository = "https://github.com/HollowNumber/dtu-note-template"  # Source repository URL
+author = "Mikkel M.H. Pedersen <mikkel.helding@gmail.com>"
+license = "MIT"                                          # License type
+
+# =============================================================================
+# TEMPLATE DEFINITIONS
+# Define individual templates with their properties and capabilities
+# =============================================================================
+
+[[templates]]
+name = "note"                                     # Internal template identifier
+display_name = "Lecture Notes"                           # User-friendly name shown in CLI
+description = "Standard template for taking lecture notes with DTU branding"
+file = "src/layouts/note.typ"                                     # Template file name in package
+function = "dtu-note"                            # Typst function name to call
+supports_variants = true                                 # Whether this template has variants
+course_types = ["all"]                                  # Course types this applies to (or "all")
+default_sections = [                                    # Default sections created in template
+    "Key Concepts",
+    "Examples",
+    "Important Points",
+    "Questions & Follow-up"
+]
+
+[[templates]]
+name = "assignment"                                      # Assignment template
+display_name = "Assignment"
+description = "Standard DTU assignment template with problem-solving structure"
+file = "src/layoutsassignment.typ"
+function = "dtu-assignment"
+supports_variants = true                                # Has math/programming variants
+course_types = ["all"]
+default_sections = [
+    "Problem Statement",
+    "Solution Approach",
+    "Implementation",
+    "Analysis",
+    "Conclusion"
+]
+
+[[templates]]
+name = "lab-report"                                     # Lab report template
+display_name = "Lab Report"
+description = "Laboratory report template for experimental courses"
+file = "lab-report.typ"
+function = "lab-report-template"
+supports_variants = true
+course_types = ["physics", "chemistry", "engineering"] # Specific course types only
+default_sections = [
+    "Objective",
+    "Method",
+    "Results",
+    "Discussion",
+    "Conclusion"
+]
+
+[[templates]]
+name = "thesis"                                         # Long-form document template
+display_name = "Thesis/Project Report"
+description = "Extended academic writing for thesis and major projects"
+file = "thesis.typ"
+function = "thesis-template"
+supports_variants = false                               # No variants for thesis
+course_types = ["all"]
+default_sections = [
+    "Introduction",
+    "Literature Review",
+    "Methodology",
+    "Results",
+    "Discussion",
+    "Conclusion"
+]
+
+# =============================================================================
+# TEMPLATE VARIANTS
+# Specialized versions of templates for different course types
+# =============================================================================
+
+[[variants]]
+template = "assignment"                                  # Refers to template name above
+name = "math-assignment"                                # Variant identifier
+display_name = "Mathematical Assignment"                # User-friendly variant name
+course_types = ["math", "statistics", "engineering"]   # Course types using this variant
+file = "src/variants/math-assignment.typ"                  # Variant-specific template file
+function = "math-assignment"                  # Optional: custom function name
+additional_sections = [                                 # Extra sections for this variant
+    "Mathematical Proofs",
+    "Theoretical Analysis",
+    "Formula Derivations"
+]
+
+[[variants]]
+template = "assignment"
+name = "programming-assignment"
+display_name = "Programming Assignment"
+course_types = ["programming", "software", "computer-science"]
+file = "src/variants/programming-assignment.typ"
+additional_sections = [
+    "Algorithm Design",
+    "Code Implementation",
+    "Testing Strategy",
+    "Performance Analysis"
+]
+
+# =============================================================================
+# COURSE TYPE MAPPING
+# Maps DTU course code patterns to course types for automatic variant selection
+# =============================================================================
+
+[course_mapping]
+"01xxx" = "math"                    # Math courses (01005, 01006, etc.)
+"02xxx" = "programming"             # Computer Science (02101, 02102, etc.)

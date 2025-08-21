@@ -11,7 +11,7 @@
     stroke: (left: 4pt + dtu-blue),
     radius: (right: 3pt),
     [
-      #text(weight: "bold", fill: dtu-blue, size: 12pt)[Definition: #term] 
+      #text(weight: "bold", fill: dtu-blue, size: 12pt)[Definition: #term]
       #v(0.3em)
       #content
     ]
@@ -58,7 +58,7 @@
     stroke: 2pt + dtu-coral,
     radius: 4pt,
     [
-      #text(weight: "bold", fill: dtu-coral, size: 12pt)[⚠ Important]
+      #text(weight: "bold", fill: dtu-coral, size: 12pt)[Important]
       #v(0.3em)
       #content
     ]
@@ -73,7 +73,7 @@
     stroke: (left: 4pt + dtu-yellow),
     radius: (right: 3pt),
     [
-      #text(fill: dtu-dark-blue, size: 10pt)[📝 ] #content
+      #text(fill: dtu-dark-blue, size: 10pt)[Note]#content
     ]
   )
 }

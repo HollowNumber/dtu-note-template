@@ -1,6 +1,6 @@
 # DTU Template Enhancement & Publishing Guide
 
-## 🚀 Current Enhancements Added
+## Current Enhancements Added
 
 ### 1. **Enhanced Code Blocks with `codelst`**
 
