@@ -4,7 +4,7 @@
 
 [metadata]
 # Package identification
-name = "dtu-templates"                                    # Template package name
+name = "dtu-template"                                    # Template package name
 version = "0.4.0"                                        # Template package version
 description = "Unofficial DTU academic templates for notes and assignments"  # Package description
 repository = "https://github.com/HollowNumber/dtu-note-template"  # Source repository URL
