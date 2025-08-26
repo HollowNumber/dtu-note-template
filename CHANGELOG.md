@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Extended integration with dtu-notes CLI
 - Custom color theme support
 
+## [0.4.1] - 2025-08-22
+
+- **Bug Fixes**: Fixed typo in `.noter.config.toml` that would cause it to not compile
+
 ## [0.4.0] - 2025-08-21
 
 - **Enhanced CLI Integration**: Full integration configuration for DTU Notes CLI
