@@ -87,7 +87,7 @@ default_sections = [
 
 [[variants]]
 template = "assignment"                                  # Refers to template name above
-name = "math-assignment"                                # Variant identifier
+name = "dtu-math-assignment"                                # Variant identifier
 display_name = "Mathematical Assignment"                # User-friendly variant name
 course_types = ["math", "statistics", "engineering"]   # Course types using this variant
 file = "src/variants/math-assignment.typ"                  # Variant-specific template file
@@ -100,7 +100,7 @@ additional_sections = [                                 # Extra sections for thi
 
 [[variants]]
 template = "assignment"
-name = "programming-assignment"
+name = "dtu-programming-assignment"
 display_name = "Programming Assignment"
 course_types = ["programming", "software", "computer-science"]
 file = "src/variants/programming-assignment.typ"
