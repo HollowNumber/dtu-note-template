@@ -91,7 +91,7 @@ name = "dtu-math-assignment"                                # Variant identifier
 display_name = "Mathematical Assignment"                # User-friendly variant name
 course_types = ["math", "statistics", "engineering"]   # Course types using this variant
 file = "src/variants/math-assignment.typ"                  # Variant-specific template file
-function = "math-assignment"                  # Optional: custom function name
+function = "dtu-math-assignment"                  # Optional: custom function name
 additional_sections = [                                 # Extra sections for this variant
     "Mathematical Proofs",
     "Theoretical Analysis",
@@ -100,9 +100,10 @@ additional_sections = [                                 # Extra sections for thi
 
 [[variants]]
 template = "assignment"
-name = "dtu-programming-assignment"
+name = "programming-assignment"
 display_name = "Programming Assignment"
 course_types = ["programming", "software", "computer-science"]
+function = "dtu-programming-assignment"
 file = "src/variants/programming-assignment.typ"
 additional_sections = [
     "Algorithm Design",
