@@ -5,7 +5,7 @@
 [metadata]
 # Package identification
 name = "dtu-template"                                    # Template package name
-version = "0.4.2"                                        # Template package version
+version = "0.4.3"                                        # Template package version
 description = "Unofficial DTU academic templates for notes and assignments"  # Package description
 repository = "https://github.com/HollowNumber/dtu-note-template"  # Source repository URL
 author = "Mikkel M.H. Pedersen <mikkel.helding@gmail.com>"
@@ -35,7 +35,7 @@ default_sections = [                                    # Default sections creat
 name = "assignment"                                      # Assignment template
 display_name = "Assignment"
 description = "Standard DTU assignment template with problem-solving structure"
-file = "src/layoutsassignment.typ"
+file = "src/layouts/assignment.typ"
 function = "dtu-assignment"
 supports_variants = true                                # Has math/programming variants
 course_types = ["all"]
@@ -47,38 +47,6 @@ default_sections = [
     "Conclusion"
 ]
 
-[[templates]]
-name = "lab-report"                                     # Lab report template
-display_name = "Lab Report"
-description = "Laboratory report template for experimental courses"
-file = "lab-report.typ"
-function = "lab-report-template"
-supports_variants = true
-course_types = ["physics", "chemistry", "engineering"] # Specific course types only
-default_sections = [
-    "Objective",
-    "Method",
-    "Results",
-    "Discussion",
-    "Conclusion"
-]
-
-[[templates]]
-name = "thesis"                                         # Long-form document template
-display_name = "Thesis/Project Report"
-description = "Extended academic writing for thesis and major projects"
-file = "thesis.typ"
-function = "thesis-template"
-supports_variants = false                               # No variants for thesis
-course_types = ["all"]
-default_sections = [
-    "Introduction",
-    "Literature Review",
-    "Methodology",
-    "Results",
-    "Discussion",
-    "Conclusion"
-]
 
 # =============================================================================
 # TEMPLATE VARIANTS

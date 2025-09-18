@@ -4,7 +4,7 @@
 #import "../colors.typ": *
 #import "../layouts/assignment.typ": dtu-assignment
 #import "../enhanced.typ": code-block, alert
-#import "@preview/codelst:2.0.1": sourcecode
+#import "@preview/codelst:2.0.2": sourcecode
 
 // Programming-specific components
 #let code-specification(content) = {

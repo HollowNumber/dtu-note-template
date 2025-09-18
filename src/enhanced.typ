@@ -2,13 +2,13 @@
 // Advanced components with syntax highlighting and rich content features
 
 #import "colors.typ": *
-#import "@preview/codelst:2.0.1": sourcecode
+#import "@preview/codelst:2.0.2": sourcecode
 
-// Enhanced code block with syntax highlighting  
+// Enhanced code block with syntax highlighting
 #let code-block(code, language: none, caption: none, line-numbers: false) = {
   let bg-color = rgb("#f8f8f8")
   let border-color = dtu-gray
-  
+
   block(
     width: 100%,
     fill: bg-color,
@@ -69,13 +69,13 @@
   let (color, icon, title) = if type == "warning" {
     (dtu-yellow, "⚠", "Warning")
   } else if type == "error" {
-    (dtu-coral, "❌", "Error")  
+    (dtu-coral, "❌", "Error")
   } else if type == "success" {
     (dtu-green, "✅", "Success")
   } else {
     (dtu-blue, "ℹ", "Info")
   }
-  
+
   rect(
     width: 100%,
     inset: 1.2em,

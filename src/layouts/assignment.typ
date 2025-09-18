@@ -53,25 +53,25 @@
       }
     }
   )
-  
+
   // Typography (same as notes) with robust fallbacks
   set text(
-    font: ("Liberation Sans", "DejaVu Sans", "Arial", "Helvetica", "sans-serif"),
+    font: ("Liberation Sans", "DejaVu Sans", "Arial", "Helvetica"),
     size: 11pt,
     lang: "en"
   )
-  
+
   set par(
     justify: true,
     leading: 0.65em,
   )
-  
+
   // Math
   set math.equation(numbering: "(1)")
-  
+
   // Problem numbering
   set enum(numbering: "1.a.i.")
-  
+
   // DTU Assignment header
   align(center)[
     #grid(
@@ -88,21 +88,21 @@
         ]
       ]
     )
-    
+
     #v(1.5em)
-    
+
     #block(spacing: 1.5em)[
       #text(size: 22pt, weight: "bold", fill: dtu-red)[#title]
     ]
-    
+
     #text(size: 16pt, fill: dtu-blue, weight: "bold")[#course]
     #if course-name != "" [
       #linebreak()
       #text(size: 13pt, fill: dtu-dark-blue, weight: "medium")[#course-name]
     ]
-    
+
     #v(1.2em)
-    
+
     #grid(
       columns: 2,
       column-gutter: 3em,
@@ -117,11 +117,11 @@
       ]
     )
   ]
-  
+
   line(length: 100%, stroke: 1.5pt + dtu-red)
-  
+
   v(2em)
-  
+
   // Content
   body
 }

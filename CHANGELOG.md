@@ -14,9 +14,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Extended integration with dtu-notes CLI
 - Custom color theme support
 
+## [0.4.3] - 2025-09-18
+
+- **Bug fix**: Fixed the compilation warning saying invalid font `sans-serif`
+- **Removed**: Artifact file
+
 ## [0.4.2] - 2025-09-11
 
-- **Bug fix**: Fixed typo in `.noter.config.toml` that causes variants to not properly be imported. 
+- **Bug fix**: Fixed typo in `.noter.config.toml` that causes variants to not properly be imported.
 
 ## [0.4.1] - 2025-08-22
 

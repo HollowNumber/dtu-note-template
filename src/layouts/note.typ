@@ -53,19 +53,19 @@
       }
     }
   )
-  
+
   // Typography - Following DTU guidelines with robust fallbacks for CI/CD
   set text(
-    font: ("Liberation Sans", "DejaVu Sans", "Arial", "Helvetica", "sans-serif"),
+    font: ("Liberation Sans", "DejaVu Sans", "Arial", "Helvetica"),
     size: 11pt,
     lang: "en"
   )
-  
+
   set par(
     justify: true,
     leading: 0.65em,
   )
-  
+
   // Headings with DTU styling
   show heading.where(level: 1): it => {
     set text(size: 20pt, weight: "bold", fill: dtu-red)
@@ -74,35 +74,35 @@
     line(length: 100%, stroke: 2pt + dtu-red)
     v(1.2em)
   }
-  
+
   show heading.where(level: 2): it => {
     set text(size: 16pt, weight: "bold", fill: dtu-blue)
     block(spacing: 1.2em, it)
   }
-  
+
   show heading.where(level: 3): it => {
     set text(size: 13pt, weight: "bold", fill: dtu-dark-blue)
     block(spacing: 1em, it)
   }
-  
+
   // Math styling
   set math.equation(numbering: "(1)")
   show math.equation: set text(fill: dtu-black)
-  
+
   // Lists
   set enum(numbering: "1.a.i.")
   set list(marker: ([•], [◦], [‣]))
-  
+
   // DTU-branded title page
   align(center)[
     // DTU Logo representation
     #image("../assets/dtu-logo-cmyk.png", width: 25%)
     #v(6mm)
-    
+
     #block(spacing: 1.8em)[
       #text(size: 26pt, weight: "bold", fill: dtu-red)[#title]
     ]
-    
+
     #block(spacing: 1.2em)[
       #text(size: 18pt, fill: dtu-blue, weight: "bold")[#course]
       #if course-name != "" [
@@ -110,9 +110,9 @@
         #text(size: 14pt, fill: dtu-dark-blue, weight: "medium")[#course-name]
       ]
     ]
-    
+
     #v(1.5em)
-    
+
     #grid(
       columns: 2,
       column-gutter: 3em,
@@ -130,18 +130,18 @@
         ]
       ]
     )
-    
+
     #if author != "" [
       #v(2em)
       #text(size: 12pt, fill: dtu-black, weight: "medium")[#author]
     ]
-    
+
     #v(1em)
     #line(length: 80%, stroke: 1pt + dtu-gray)
   ]
-  
+
   pagebreak()
-  
+
   // Content
   body
 }

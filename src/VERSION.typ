@@ -1,7 +1,7 @@
 // DTU Template Version Information
 // Provides version constants and metadata
 
-#let version = "0.3.0"
+#let version = "0.4.3"
 #let version-date = datetime(year: 2025, month: 8, day: 15)
 #let template-name = "DTU Typst Template"
 #let template-description = "Academic note-taking and assignment template following DTU design guidelines"
