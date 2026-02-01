@@ -11,8 +11,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Additional content box styles
 - Support for multi-language documents
-- Extended integration with dtu-notes CLI
+- Extended integration with `noter` CLI
 - Custom color theme support
+
+## [0.6.0] - 2026-01-02
+
+### Added
+
+- Physics template variant for lecture notes and assignments [#2 and #3](https://github.com/HollowNumber/dtu-note-template/pull/3)
+
+
+### Changed
+- Updated `.noter.config.toml` to version 0.6.0 
+- Updated references of `dtu-notes` to noter CLI
 
 ## [0.5.1] - 2025-11-14
 - **Removed**: Legacy code, since it has no usage

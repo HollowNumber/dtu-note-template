@@ -10,7 +10,7 @@ A professional Typst template package for Danish Technical University (DTU) stud
 - **Styled Content Boxes**: Definitions, theorems, examples, important notes, and highlights
 - **Header/Footer**: Professional headers and footers with DTU branding
 - **Mathematical Styling**: Proper equation numbering and formatting
-- **CLI Integration**: Designed to work with [dtu-notes](https://github.com/HollowNumber/dtu-notes) Rust CLI
+- **CLI Integration**: Designed to work with [noter](https://github.com/HollowNumber/noter) Rust CLI
 
 ## Installation
 
@@ -46,7 +46,7 @@ This is your content...
 More content here...
 ```
 
-> **Note**: For enhanced workflow with automatic course name resolution and project management, consider using the [dtu-notes](https://github.com/HollowNumber/dtu-notes) CLI tool.
+> **Note**: For enhanced workflow with automatic course name resolution and project management, consider using the [noter](https://github.com/HollowNumber/noter) CLI tool.
 
 ### Assignment Template
 
@@ -66,7 +66,7 @@ More content here...
 Solve the following...
 ```
 
-> **Tip**: The [dtu-notes](https://github.com/HollowNumber/dtu-notes) CLI can automatically generate templates with course information.
+> **Tip**: The [noter](https://github.com/HollowNumber/noter) CLI can automatically generate templates with course information.
 
 ### Content Boxes
 
@@ -137,7 +137,7 @@ The template includes all official DTU colors:
 
 ## CLI Integration and Configuration
 
-This template is designed to work seamlessly with the [dtu-notes](https://github.com/HollowNumber/dtu-notes) Rust CLI tool. The integration is configured through the `.noter.config.toml` file, which defines how the templates interact with the CLI system.
+This template is designed to work seamlessly with the [noter](https://github.com/HollowNumber/noter) Rust CLI tool. The integration is configured through the `.noter.config.toml` file, which defines how the templates interact with the CLI system.
 
 ### Configuration File Structure
 
