@@ -80,6 +80,38 @@ additional_sections = [
     "Performance Analysis"
 ]
 
+[[variants]]
+template = "assignment"
+name = "physics-assignment"
+display_name = "Physics Assignment"
+course_types = ["physics", "mechanics", "electromagnetism", "thermodynamics"]
+function = "dtu-physics-assignment"
+file = "src/variants/physics-assignment.typ"
+additional_sections = [
+    "Given Quantities",
+    "Physical Principles",
+    "Free Body Diagrams",
+    "Derivation",
+    "Unit Analysis",
+    "Numerical Solution"
+]
+
+[[variants]]
+template = "note"
+name = "physics-note"
+display_name = "Physics Lecture Notes"
+course_types = ["physics", "mechanics", "electromagnetism", "thermodynamics"]
+function = "dtu-physics-note"
+file = "src/variants/physics-note.typ"
+additional_sections = [
+    "Physical Laws",
+    "Key Equations",
+    "Derivations",
+    "Phenomena",
+    "Limiting Cases",
+    "Common Misconceptions"
+]
+
 # =============================================================================
 # COURSE TYPE MAPPING
 # Maps DTU course code patterns to course types for automatic variant selection
@@ -88,3 +120,4 @@ additional_sections = [
 [course_mapping]
 "01xxx" = "math"                    # Math courses (01005, 01006, etc.)
 "02xxx" = "programming"             # Computer Science (02101, 02102, etc.)
+"10xxx" = "physics"                 # Physics courses (10060, etc.)
