@@ -14,6 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Extended integration with `noter` CLI
 - Custom color theme support
 
+## [0.6.1] - 2026-02-02
+
+### Bugfix
+
+- Fixed typst.toml versioning
+
 ## [0.6.0] - 2026-01-02
 
 ### Added
