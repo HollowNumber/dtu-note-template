@@ -14,6 +14,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Extended integration with `noter` CLI
 - Custom color theme support
 
+## [0.6.2] - 2026-06-02
+
+## Added 
+
+- `scalar(x,y)` to math helpers, this is equivalent to writing `$lr(chevron.l x, y chevron.r)$`
+- `par` to math helpers, equivalent to writing out the full `$partial$`
+- Added `set math.vec` and `set math.mat` to `layout/note.typ` and `math assignment` variant
+
 ## [0.6.1] - 2026-02-02
 
 ### Bugfix
