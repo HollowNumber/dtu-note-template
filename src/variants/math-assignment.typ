@@ -149,6 +149,8 @@
 
   // Math-specific styling
   set math.equation(numbering: "(1)")
+  set math.mat(delim: "[")
+  set math.vec(delim: "[")
 
   // Enhanced math display
   show math.equation: set text(size: 12pt)

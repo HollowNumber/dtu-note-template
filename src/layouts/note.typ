@@ -142,6 +142,9 @@
 
   pagebreak()
 
+  set math.mat(delim: "[")
+  set math.vec(delim: "[")
+
   // Content
   body
 }
