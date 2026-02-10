@@ -14,6 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Extended integration with `noter` CLI
 - Custom color theme support
 
+## [0.6.3] - 2026-10-02
+
+## Added 
+
+- `jacobi(n, m, f: $f$, x: $x$)` for quickly constructing jacobi matrices.
+
 ## [0.6.2] - 2026-06-02
 
 ## Added 
